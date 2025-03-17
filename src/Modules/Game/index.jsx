@@ -180,7 +180,8 @@ const Game = () => {
 
   useEffect(() => {
     setFood(generateFood());
-  }, [generateFood]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (score > highScore) {
