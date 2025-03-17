@@ -44,7 +44,7 @@ const GameArea = styled.div`
   position: relative;
   border: 2px solid #333;
   background-color: #f0f0f0;
-  overflow: hidden; // Prevent overflow of game elements
+  overflow: hidden;
   width: ${(props) => props.width}px;
   height: ${(props) => props.height}px;
   flex-grow: 1;

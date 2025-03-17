@@ -1,21 +1,18 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Button, Cell, GameArea, GameContainer, Image, InfoText, Overlay, Title } from "./styles";
 
-// Dynamic calculation of GRID_SIZE and CELL_SIZE
 const calculateGridSize = () => {
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
 
-  // Let's assume you want the grid to take up 80% of the screen width and height
-  const gridWidth = Math.floor((screenWidth * 0.8) / 20); // 20px is the cell size, adjust as needed
-  const gridHeight = Math.floor((screenHeight * 0.8) / 20); // Adjust cell size as needed
+  const gridWidth = Math.floor((screenWidth * 0.8) / 20);
+  const gridHeight = Math.floor((screenHeight * 0.8) / 20);
   return { gridWidth, gridHeight };
 };
 
 const Game = () => {
   const { gridWidth, gridHeight } = calculateGridSize();
 
-  // Local storage to keep track of the high score
   const getHighScore = () => {
     const highScore = localStorage.getItem("highScore");
     return highScore ? parseInt(highScore) : 0;
@@ -29,10 +26,10 @@ const Game = () => {
   const [food, setFood] = useState({ x: 5, y: 5 });
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
-  const [fruitCount, setFruitCount] = useState(0); // Track fruits eaten in the current round
+  const [fruitCount, setFruitCount] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [speed, setSpeed] = useState(150);
-  const [highScore, setHighScore] = useState(getHighScore()); // Get the saved high score
+  const [highScore, setHighScore] = useState(getHighScore());
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -41,7 +38,7 @@ const Game = () => {
         case "ArrowDown":
         case "ArrowLeft":
         case "ArrowRight":
-          event.preventDefault(); // Prevent default scroll behavior
+          event.preventDefault();
           break;
         default:
           break;
@@ -53,7 +50,6 @@ const Game = () => {
   }, []);
 
   const generateFood = useCallback(() => {
-    // Generate random food coordinates within the grid range (0 to gridWidth-1, 0 to gridHeight-1)
     const newFood = {
       x: Math.floor(Math.random() * gridWidth),
       y: Math.floor(Math.random() * gridHeight),
@@ -61,7 +57,7 @@ const Game = () => {
 
     const isOnSnake = snake.some((segment) => segment.x === newFood.x && segment.y === newFood.y);
     if (isOnSnake) {
-      return generateFood(); // Recursively generate new food if it's on the snake
+      return generateFood();
     }
 
     return newFood;
@@ -92,6 +88,7 @@ const Game = () => {
           break;
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [direction]
   );
 
@@ -142,7 +139,7 @@ const Game = () => {
 
     if (head.x === food.x && head.y === food.y) {
       setScore((prevScore) => prevScore + 1);
-      setFruitCount((prevFruitCount) => prevFruitCount + 1); // Increment fruit count
+      setFruitCount((prevFruitCount) => prevFruitCount + 1);
       setFood(generateFood());
 
       if (score > 0 && score % 5 === 0) {
@@ -154,10 +151,10 @@ const Game = () => {
 
     newSnake.unshift(head);
     setSnake(newSnake);
-  }, [snake, direction, food, gameOver, isPaused, checkCollision, generateFood, score, gridWidth, gridHeight]);
+  }, [snake, direction, food, gameOver, isPaused, checkCollision, generateFood, score]);
 
   const resetGame = () => {
-    const { gridWidth, gridHeight } = calculateGridSize(); // Recalculate grid size on reset
+    const { gridWidth, gridHeight } = calculateGridSize();
     setSnake([
       { x: Math.floor(gridWidth / 2), y: Math.floor(gridHeight / 2) },
       { x: Math.floor(gridWidth / 2), y: Math.floor(gridHeight / 2) + 1 },
@@ -166,7 +163,7 @@ const Game = () => {
     setFood(generateFood());
     setGameOver(false);
     setScore(0);
-    setFruitCount(0); // Reset fruit count
+    setFruitCount(0);
     setIsPaused(false);
     setSpeed(150);
   };
@@ -183,12 +180,12 @@ const Game = () => {
 
   useEffect(() => {
     setFood(generateFood());
-  }, []);
+  }, [generateFood]);
 
   useEffect(() => {
     if (score > highScore) {
       setHighScore(score);
-      localStorage.setItem("highScore", score); // Save high score to localStorage
+      localStorage.setItem("highScore", score);
     }
   }, [score, highScore]);
 
@@ -200,12 +197,10 @@ const Game = () => {
         const isHead = snake[0].x === x && snake[0].y === y;
         const isFood = food.x === x && food.y === y;
 
-        // Render Snake Cells
         if (isSnake || isHead) {
           grid.push(<Cell key={`${x}-${y}`} x={x} y={y} isSnake={isSnake} isHead={isHead} cellSize={20} />);
         }
 
-        // If it's the food, render the apple image
         if (isFood) {
           grid.push(
             <Cell key={`${x}-${y}`} x={x} y={y} cellSize={20} isFood={true}>
