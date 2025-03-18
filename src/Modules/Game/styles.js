@@ -3,15 +3,20 @@ import styled from "styled-components";
 const Title = styled.h1`
   font-family: "Roboto", sans-serif;
   color: #333;
-  font-size: 2vw;
+  font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  white-space: nowrap;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  background: white;
+  border-radius: 50px;
 `;
 
 const Image = styled.img`
-  hight: 4%;
-  width: 4%;
+  height: 30px;
+  width: 30px;
 `;
 
 const InfoPanel = styled.div`
@@ -36,10 +41,13 @@ const GameContainer = styled.div`
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  height: auto;
-  width: auto;
-  background-color: #ffffff;
-  border-radius: 12px;
+  height: 100vh;
+  width: 100%;
+  background-image: url("/wallpaper.png");
+  background-repeat: repeat;
+  background-size: 300px 300px;
+  background-blend-mode: overlay;
+  gap: 0;
 `;
 
 const GameArea = styled.div`
@@ -66,7 +74,6 @@ const Cell = styled.div.attrs((props) => ({
   background-color: ${(props) => {
     if (props.isHead) return "#388E3C";
     if (props.isSnake) return "#4CAF50";
-    if (props.isFood) return "#F44336";
     return "transparent";
   }};
   border-radius: ${(props) => {
@@ -114,4 +121,9 @@ const Button = styled.button`
   }
 `;
 
-export { Button, Cell, GameArea, GameContainer, Image, InfoPanel, InfoText, Overlay, Title };
+const Score = styled.p`
+  padding-right: 1rem;
+  padding-left: 0.2rem;
+`;
+
+export { Button, Cell, GameArea, GameContainer, Image, InfoPanel, InfoText, Overlay, Title, Score };

@@ -1,5 +1,18 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Cell, GameArea, GameContainer, Image, InfoText, Overlay, Title } from "./styles";
+import { Button, Cell, GameArea, GameContainer, Image, InfoText, Overlay, Score, Title } from "./styles";
+
+const fruits = [
+  { type: "apple", points: 1, imgSrc: "/apple.png" },
+  { type: "pear", points: 1, imgSrc: "/pear.png" },
+  { type: "pineapple", points: 1, imgSrc: "/pineapple.png" },
+  { type: "grape", points: 2, imgSrc: "/grape.png" },
+  { type: "cherry", points: 2, imgSrc: "/cherry.png" },
+  { type: "banana", points: 2, imgSrc: "/banana.png" },
+  { type: "peach", points: 3, imgSrc: "/peach.png" },
+  { type: "strawberry", points: 3, imgSrc: "/strawberry.png" },
+  { type: "orange", points: 3, imgSrc: "/orange.png" },
+  { type: "fruit", points: 5, imgSrc: "/fruit.png" },
+];
 
 const calculateGridSize = () => {
   const screenWidth = window.innerWidth;
@@ -8,6 +21,22 @@ const calculateGridSize = () => {
   const gridWidth = Math.floor((screenWidth * 0.8) / 20);
   const gridHeight = Math.floor((screenHeight * 0.8) / 20);
   return { gridWidth, gridHeight };
+};
+
+const generateFood = (snake, gridSize) => {
+  const randomFruit = fruits[Math.floor(Math.random() * fruits.length)];
+  const newFood = {
+    x: Math.floor(Math.random() * gridSize.gridWidth),
+    y: Math.floor(Math.random() * gridSize.gridHeight),
+    fruit: randomFruit,
+  };
+
+  const isOnSnake = snake.some((segment) => segment.x === newFood.x && segment.y === newFood.y);
+  if (isOnSnake) {
+    return generateFood(snake, gridSize);
+  }
+
+  return newFood;
 };
 
 const Game = () => {
@@ -23,13 +52,15 @@ const Game = () => {
     { x: Math.floor(gridWidth / 2), y: Math.floor(gridHeight / 2) + 1 },
   ]);
   const [direction, setDirection] = useState("UP");
-  const [food, setFood] = useState({ x: 5, y: 5 });
+  const [foods, setFoods] = useState(
+    Array(5)
+      .fill(null)
+      .map(() => generateFood(snake, { gridWidth, gridHeight }))
+  );
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
-  const [fruitCount, setFruitCount] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [speed, setSpeed] = useState(150);
-  const [highScore, setHighScore] = useState(getHighScore());
   const [gridSize, setGridSize] = useState(calculateGridSize());
 
   useEffect(() => {
@@ -40,67 +71,6 @@ const Game = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      switch (event.key) {
-        case "ArrowUp":
-        case "ArrowDown":
-        case "ArrowLeft":
-        case "ArrowRight":
-          event.preventDefault();
-          break;
-        default:
-          break;
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  const generateFood = useCallback(() => {
-    const newFood = {
-      x: Math.floor(Math.random() * gridSize.gridWidth),
-      y: Math.floor(Math.random() * gridSize.gridHeight),
-    };
-
-    const isOnSnake = snake.some((segment) => segment.x === newFood.x && segment.y === newFood.y);
-    if (isOnSnake) {
-      return generateFood();
-    }
-
-    return newFood;
-  }, [snake, gridWidth, gridHeight]);
-
-  const handleKeyDown = useCallback(
-    (event) => {
-      switch (event.key) {
-        case "ArrowUp":
-          if (direction !== "DOWN") setDirection("UP");
-          break;
-        case "ArrowDown":
-          if (direction !== "UP") setDirection("DOWN");
-          break;
-        case "ArrowLeft":
-          if (direction !== "RIGHT") setDirection("LEFT");
-          break;
-        case "ArrowRight":
-          if (direction !== "LEFT") setDirection("RIGHT");
-          break;
-        case " ":
-          setIsPaused((prev) => !prev);
-          break;
-        case "r":
-          resetGame();
-          break;
-        default:
-          break;
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [direction]
-  );
 
   const checkCollision = useCallback(
     (head) => {
@@ -116,7 +86,7 @@ const Game = () => {
 
       return false;
     },
-    [snake, gridWidth, gridHeight]
+    [snake, gridSize]
   );
 
   const moveSnake = useCallback(() => {
@@ -147,21 +117,37 @@ const Game = () => {
       return;
     }
 
-    if (head.x === food.x && head.y === food.y) {
-      setScore((prevScore) => prevScore + 1);
-      setFruitCount((prevFruitCount) => prevFruitCount + 1);
-      setFood(generateFood());
+    let eatenFood = null;
 
-      if (score > 0 && score % 5 === 0) {
-        setSpeed((prevSpeed) => Math.max(prevSpeed - 10, 50));
+    const newFoods = foods.filter((food) => {
+      if (head.x === food.x && head.y === food.y) {
+        eatenFood = food;
+        return false;
       }
-    } else {
+      return true;
+    });
+
+    if (eatenFood) {
+      setScore((prevScore) => prevScore + eatenFood.fruit.points);
+
+      for (let i = 0; i < eatenFood.fruit.points; i++) {
+        const newTail = { ...newSnake[newSnake.length - 1] };
+        newSnake.push(newTail);
+      }
+
+      while (newFoods.length < 5) {
+        newFoods.push(generateFood(newSnake, gridSize));
+      }
+    }
+
+    if (!eatenFood) {
       newSnake.pop();
     }
 
     newSnake.unshift(head);
     setSnake(newSnake);
-  }, [snake, direction, food, gameOver, isPaused, checkCollision, generateFood, score]);
+    setFoods(newFoods);
+  }, [snake, direction, checkCollision, gridSize, gameOver, isPaused, foods]);
 
   const resetGame = () => {
     const newGridSize = calculateGridSize();
@@ -171,35 +157,70 @@ const Game = () => {
       { x: Math.floor(newGridSize.gridWidth / 2), y: Math.floor(newGridSize.gridHeight / 2) + 1 },
     ]);
     setDirection("UP");
-    setFood(generateFood());
+    setFoods(
+      Array(5)
+        .fill(null)
+        .map(() => generateFood([], newGridSize))
+    );
     setGameOver(false);
     setScore(0);
-    setFruitCount(0);
     setIsPaused(false);
     setSpeed(150);
   };
+
+  useEffect(() => {
+    if (score > 0 && score % 5 === 0) {
+      setSpeed((prevSpeed) => Math.max(prevSpeed - 10, 50));
+    }
+  }, [score]);
 
   useEffect(() => {
     const timer = setInterval(moveSnake, speed);
     return () => clearInterval(timer);
   }, [moveSnake, speed]);
 
+  const handleKeyDown = useCallback(
+    (event) => {
+      event.preventDefault();
+
+      switch (event.key) {
+        case "ArrowUp":
+          if (direction !== "DOWN") setDirection("UP");
+          break;
+        case "ArrowDown":
+          if (direction !== "UP") setDirection("DOWN");
+          break;
+        case "ArrowLeft":
+          if (direction !== "RIGHT") setDirection("LEFT");
+          break;
+        case "ArrowRight":
+          if (direction !== "LEFT") setDirection("RIGHT");
+          break;
+        case " ":
+          setIsPaused((prev) => !prev);
+          break;
+        case "r":
+          resetGame();
+          break;
+        default:
+          break;
+      }
+    },
+    [direction]
+  );
+
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
+  // Save high score
   useEffect(() => {
-    setFood(generateFood());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
+    const highScore = getHighScore();
     if (score > highScore) {
-      setHighScore(score);
       localStorage.setItem("highScore", score);
     }
-  }, [score, highScore]);
+  }, [score]);
 
   const renderGrid = () => {
     const grid = [];
@@ -207,19 +228,20 @@ const Game = () => {
       for (let x = 0; x < gridWidth; x++) {
         const isSnake = snake.some((segment) => segment.x === x && segment.y === y);
         const isHead = snake[0].x === x && snake[0].y === y;
-        const isFood = food.x === x && food.y === y;
 
         if (isSnake || isHead) {
           grid.push(<Cell key={`${x}-${y}`} x={x} y={y} isSnake={isSnake} isHead={isHead} cellSize={20} />);
         }
 
-        if (isFood) {
-          grid.push(
-            <Cell key={`${x}-${y}`} x={x} y={y} cellSize={20} isFood={true}>
-              <Image src="/apple.png" style={{ width: "100%", height: "100%" }} />
-            </Cell>
-          );
-        }
+        foods.forEach((food) => {
+          if (food.x === x && food.y === y) {
+            grid.push(
+              <Cell key={`${x}-${y}`} x={x} y={y} cellSize={20} isFood={true}>
+                <Image src={food.fruit.imgSrc} style={{ width: "100%", height: "100%" }} />
+              </Cell>
+            );
+          }
+        });
       }
     }
     return grid;
@@ -229,12 +251,10 @@ const Game = () => {
     <GameContainer>
       <Title>
         <InfoText>
-          <Image src="/apple.png" />
-          {fruitCount}
-        </InfoText>
-        <InfoText>
+          <Image src="/fruit.png" />
+          <Score>{score}</Score>
           <Image src="/trophy.png" />
-          {highScore}
+          <Score>{getHighScore()}</Score>
         </InfoText>
         Snake Game
       </Title>
