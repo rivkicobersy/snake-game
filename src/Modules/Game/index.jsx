@@ -30,6 +30,16 @@ const Game = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [speed, setSpeed] = useState(150);
   const [highScore, setHighScore] = useState(getHighScore());
+  const [gridSize, setGridSize] = useState(calculateGridSize());
+
+  useEffect(() => {
+    const handleResize = () => {
+      setGridSize(calculateGridSize());
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -51,8 +61,8 @@ const Game = () => {
 
   const generateFood = useCallback(() => {
     const newFood = {
-      x: Math.floor(Math.random() * gridWidth),
-      y: Math.floor(Math.random() * gridHeight),
+      x: Math.floor(Math.random() * gridSize.gridWidth),
+      y: Math.floor(Math.random() * gridSize.gridHeight),
     };
 
     const isOnSnake = snake.some((segment) => segment.x === newFood.x && segment.y === newFood.y);
@@ -94,7 +104,7 @@ const Game = () => {
 
   const checkCollision = useCallback(
     (head) => {
-      if (head.x < 0 || head.x >= gridWidth || head.y < 0 || head.y >= gridHeight) {
+      if (head.x < 0 || head.x >= gridSize.gridWidth || head.y < 0 || head.y >= gridSize.gridHeight) {
         return true;
       }
 
@@ -154,10 +164,11 @@ const Game = () => {
   }, [snake, direction, food, gameOver, isPaused, checkCollision, generateFood, score]);
 
   const resetGame = () => {
-    const { gridWidth, gridHeight } = calculateGridSize();
+    const newGridSize = calculateGridSize();
+    setGridSize(newGridSize);
     setSnake([
-      { x: Math.floor(gridWidth / 2), y: Math.floor(gridHeight / 2) },
-      { x: Math.floor(gridWidth / 2), y: Math.floor(gridHeight / 2) + 1 },
+      { x: Math.floor(newGridSize.gridWidth / 2), y: Math.floor(newGridSize.gridHeight / 2) },
+      { x: Math.floor(newGridSize.gridWidth / 2), y: Math.floor(newGridSize.gridHeight / 2) + 1 },
     ]);
     setDirection("UP");
     setFood(generateFood());
@@ -228,7 +239,7 @@ const Game = () => {
         Snake Game
       </Title>
 
-      <GameArea width={gridWidth * 20} height={gridHeight * 20}>
+      <GameArea width={gridSize.gridWidth * 20} height={gridSize.gridHeight * 20}>
         {renderGrid()}
         {gameOver && (
           <Overlay>

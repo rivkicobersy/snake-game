@@ -23,6 +23,8 @@ const InfoPanel = styled.div`
 const InfoText = styled.p`
   font-size: 1.2rem;
   color: #666;
+  display: flex;
+  align-items: center;
 
   @media (max-width: 768px) {
     font-size: 1rem;
@@ -51,13 +53,16 @@ const GameArea = styled.div`
   border-radius: 8px;
 `;
 
-const Cell = styled.div`
+const Cell = styled.div.attrs((props) => ({
+  style: {
+    left: `${props.x * props.cellSize}px`,
+    top: `${props.y * props.cellSize}px`,
+    width: `${props.cellSize}px`,
+    height: `${props.cellSize}px`,
+  },
+}))`
   position: absolute;
   box-sizing: border-box;
-  left: ${(props) => props.x * props.cellSize}px;
-  top: ${(props) => props.y * props.cellSize}px;
-  width: ${(props) => props.cellSize}px;
-  height: ${(props) => props.cellSize}px;
   background-color: ${(props) => {
     if (props.isHead) return "#388E3C";
     if (props.isSnake) return "#4CAF50";
@@ -109,4 +114,4 @@ const Button = styled.button`
   }
 `;
 
-export { Button, Cell, GameArea, GameContainer, InfoPanel, InfoText, Overlay, Title, Image };
+export { Button, Cell, GameArea, GameContainer, Image, InfoPanel, InfoText, Overlay, Title };
