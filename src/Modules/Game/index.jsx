@@ -27,7 +27,6 @@ const Game = () => {
   const [gridSize, setGridSize] = useState(calculateGridSize());
 
   const [touchStart, setTouchStart] = useState(null);
-  const swipeThreshold = 30;
 
   useEffect(() => {
     const handleResize = () => {
@@ -203,19 +202,17 @@ const Game = () => {
     const deltaX = touchEndX - touchStart.x;
     const deltaY = touchEndY - touchStart.y;
 
-    if (Math.abs(deltaX) > swipeThreshold || Math.abs(deltaY) > swipeThreshold) {
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        if (deltaX > 0 && direction !== "LEFT") {
-          setDirection("RIGHT");
-        } else if (deltaX < 0 && direction !== "RIGHT") {
-          setDirection("LEFT");
-        }
-      } else {
-        if (deltaY > 0 && direction !== "UP") {
-          setDirection("DOWN");
-        } else if (deltaY < 0 && direction !== "DOWN") {
-          setDirection("UP");
-        }
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX > 0 && direction !== "LEFT") {
+        setDirection("RIGHT");
+      } else if (deltaX < 0 && direction !== "RIGHT") {
+        setDirection("LEFT");
+      }
+    } else {
+      if (deltaY > 0 && direction !== "UP") {
+        setDirection("DOWN");
+      } else if (deltaY < 0 && direction !== "DOWN") {
+        setDirection("UP");
       }
     }
 
@@ -223,8 +220,8 @@ const Game = () => {
   };
 
   useEffect(() => {
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchend", handleTouchEnd);
 
     return () => {
       window.removeEventListener("touchstart", handleTouchStart);
