@@ -169,11 +169,16 @@ const Game = () => {
         case "r":
           resetGame();
           break;
+        case "Enter":
+          if (gameOver) {
+            resetGame();
+          }
+          break;
         default:
           break;
       }
     },
-    [direction]
+    [direction, gameOver]
   );
 
   useEffect(() => {
@@ -188,47 +193,60 @@ const Game = () => {
     }
   }, [score]);
 
-  const handleTouchStart = (e) => {
-    const touchStartX = e.touches[0].clientX;
-    const touchStartY = e.touches[0].clientY;
-    setTouchStart({ x: touchStartX, y: touchStartY });
-  };
-
-  const handleTouchEnd = (e) => {
-    if (!touchStart) return;
-
-    const touchEndX = e.changedTouches[0].clientX;
-    const touchEndY = e.changedTouches[0].clientY;
-    const deltaX = touchEndX - touchStart.x;
-    const deltaY = touchEndY - touchStart.y;
-
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > 0 && direction !== "LEFT") {
-        setDirection("RIGHT");
-      } else if (deltaX < 0 && direction !== "RIGHT") {
-        setDirection("LEFT");
-      }
-    } else {
-      if (deltaY > 0 && direction !== "UP") {
-        setDirection("DOWN");
-      } else if (deltaY < 0 && direction !== "DOWN") {
-        setDirection("UP");
-      }
-    }
-
-    setTouchStart(null);
-  };
-
   useEffect(() => {
+    const handleTouchStart = (e) => {
+      const touchStartX = e.touches[0].clientX;
+      const touchStartY = e.touches[0].clientY;
+      setTouchStart({ x: touchStartX, y: touchStartY });
+    };
+
+    const handleTouchEnd = (e) => {
+      if (!touchStart || gameOver) return;
+
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+
+      const deltaX = touchEndX - touchStart.x;
+      const deltaY = touchEndY - touchStart.y;
+
+      const swipeThreshold = 30;
+      const isSwipe = Math.abs(deltaX) > swipeThreshold || Math.abs(deltaY) > swipeThreshold;
+
+      if (isSwipe) {
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+          if (deltaX > 0 && direction !== "LEFT") {
+            setDirection("RIGHT");
+          } else if (deltaX < 0 && direction !== "RIGHT") {
+            setDirection("LEFT");
+          }
+        } else {
+          if (deltaY > 0 && direction !== "UP") {
+            setDirection("DOWN");
+          } else if (deltaY < 0 && direction !== "DOWN") {
+            setDirection("UP");
+          }
+        }
+      } else {
+        setIsPaused((prevIsPaused) => !prevIsPaused);
+      }
+
+      setTouchStart(null);
+    };
+
+    const handleTouchMove = (e) => {
+      e.preventDefault();
+    };
+
     window.addEventListener("touchstart", handleTouchStart);
     window.addEventListener("touchend", handleTouchEnd);
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
 
     return () => {
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("touchmove", handleTouchMove);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [touchStart, direction]);
+  }, [touchStart, direction, gameOver]);
 
   const renderGrid = () => {
     const grid = [];
