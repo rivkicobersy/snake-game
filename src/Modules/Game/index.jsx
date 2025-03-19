@@ -146,15 +146,19 @@ const Game = () => {
 
       switch (event.key) {
         case "ArrowUp":
+        case "w":
           if (direction !== "DOWN") setDirection("UP");
           break;
         case "ArrowDown":
+        case "s":
           if (direction !== "UP") setDirection("DOWN");
           break;
         case "ArrowLeft":
+        case "a":
           if (direction !== "RIGHT") setDirection("LEFT");
           break;
         case "ArrowRight":
+        case "d":
           if (direction !== "LEFT") setDirection("RIGHT");
           break;
         case " ":
