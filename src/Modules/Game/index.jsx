@@ -26,6 +26,9 @@ const Game = () => {
   const [speed, setSpeed] = useState(150);
   const [gridSize, setGridSize] = useState(calculateGridSize());
 
+  const [touchStart, setTouchStart] = useState(null);
+  const swipeThreshold = 30;
+
   useEffect(() => {
     const handleResize = () => {
       setGridSize(calculateGridSize());
@@ -185,6 +188,50 @@ const Game = () => {
       localStorage.setItem("highScore", score);
     }
   }, [score]);
+
+  const handleTouchStart = (e) => {
+    const touchStartX = e.touches[0].clientX;
+    const touchStartY = e.touches[0].clientY;
+    setTouchStart({ x: touchStartX, y: touchStartY });
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!touchStart) return;
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaX = touchEndX - touchStart.x;
+    const deltaY = touchEndY - touchStart.y;
+
+    if (Math.abs(deltaX) > swipeThreshold || Math.abs(deltaY) > swipeThreshold) {
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        if (deltaX > 0 && direction !== "LEFT") {
+          setDirection("RIGHT");
+        } else if (deltaX < 0 && direction !== "RIGHT") {
+          setDirection("LEFT");
+        }
+      } else {
+        if (deltaY > 0 && direction !== "UP") {
+          setDirection("DOWN");
+        } else if (deltaY < 0 && direction !== "DOWN") {
+          setDirection("UP");
+        }
+      }
+    }
+
+    setTouchStart(null);
+  };
+
+  useEffect(() => {
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [touchStart, direction]);
 
   const renderGrid = () => {
     const grid = [];
