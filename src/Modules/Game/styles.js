@@ -10,8 +10,15 @@ const Title = styled.h1`
   white-space: nowrap;
   padding-left: 1rem;
   padding-right: 1rem;
-  background: white;
+  background: rgba(223, 242, 220, 0.8);
   border-radius: 50px;
+  padding: 0.5rem;
+`;
+
+const TitleWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: ${(props) => props.width}px;
 `;
 
 const Image = styled.img`
@@ -38,27 +45,21 @@ const InfoText = styled.p`
 
 const GameContainer = styled.div`
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  height: 100vh;
-  width: 100%;
-  background-image: url("/wallpaper.png");
-  background-repeat: repeat;
-  background-size: 300px 300px;
-  background-blend-mode: overlay;
-  gap: 0;
+  flex-direction: column;
+  margin-top: 3%;
+  gap: 20px;
 `;
 
 const GameArea = styled.div`
   position: relative;
-  border: 2px solid #333;
-  background-color: #f0f0f0;
+  background-color: rgba(223, 242, 220, 0.8);
   overflow: hidden;
   width: ${(props) => props.width}px;
   height: ${(props) => props.height}px;
   flex-grow: 1;
-  border-radius: 8px;
+  border-radius: 12px;
 `;
 
 const Cell = styled.div.attrs((props) => ({
@@ -126,4 +127,4 @@ const Score = styled.p`
   padding-left: 0.2rem;
 `;
 
-export { Button, Cell, GameArea, GameContainer, Image, InfoPanel, InfoText, Overlay, Title, Score };
+export { Button, Cell, GameArea, GameContainer, Image, InfoPanel, InfoText, Overlay, Score, Title, TitleWrapper };

@@ -1,43 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Cell, GameArea, GameContainer, Image, InfoText, Overlay, Score, Title } from "./styles";
-
-const fruits = [
-  { type: "apple", points: 1, imgSrc: "/apple.png" },
-  { type: "pear", points: 1, imgSrc: "/pear.png" },
-  { type: "pineapple", points: 1, imgSrc: "/pineapple.png" },
-  { type: "grape", points: 2, imgSrc: "/grape.png" },
-  { type: "cherry", points: 2, imgSrc: "/cherry.png" },
-  { type: "banana", points: 2, imgSrc: "/banana.png" },
-  { type: "peach", points: 3, imgSrc: "/peach.png" },
-  { type: "strawberry", points: 3, imgSrc: "/strawberry.png" },
-  { type: "orange", points: 3, imgSrc: "/orange.png" },
-  { type: "fruit", points: 5, imgSrc: "/fruit.png" },
-];
-
-const calculateGridSize = () => {
-  const screenWidth = window.innerWidth;
-  const screenHeight = window.innerHeight;
-
-  const gridWidth = Math.floor((screenWidth * 0.8) / 20);
-  const gridHeight = Math.floor((screenHeight * 0.8) / 20);
-  return { gridWidth, gridHeight };
-};
-
-const generateFood = (snake, gridSize) => {
-  const randomFruit = fruits[Math.floor(Math.random() * fruits.length)];
-  const newFood = {
-    x: Math.floor(Math.random() * gridSize.gridWidth),
-    y: Math.floor(Math.random() * gridSize.gridHeight),
-    fruit: randomFruit,
-  };
-
-  const isOnSnake = snake.some((segment) => segment.x === newFood.x && segment.y === newFood.y);
-  if (isOnSnake) {
-    return generateFood(snake, gridSize);
-  }
-
-  return newFood;
-};
+import { calculateGridSize, generateFood } from "./functions";
+import { Button, Cell, GameArea, GameContainer, Image, InfoText, Overlay, Score, Title, TitleWrapper } from "./styles";
 
 const Game = () => {
   const { gridWidth, gridHeight } = calculateGridSize();
@@ -214,7 +177,6 @@ const Game = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  // Save high score
   useEffect(() => {
     const highScore = getHighScore();
     if (score > highScore) {
@@ -249,15 +211,17 @@ const Game = () => {
 
   return (
     <GameContainer>
-      <Title>
-        <InfoText>
-          <Image src="/fruit.png" />
-          <Score>{score}</Score>
-          <Image src="/trophy.png" />
-          <Score>{getHighScore()}</Score>
-        </InfoText>
-        Snake Game
-      </Title>
+      <TitleWrapper width={gridSize.gridWidth * 20}>
+        <Title>
+          <InfoText>
+            <Image src="/fruit.png" />
+            <Score>{score}</Score>
+            <Image src="/trophy.png" />
+            <Score>{localStorage.getItem("highScore")}</Score>
+          </InfoText>
+        </Title>
+        <Title>Snake Game</Title>
+      </TitleWrapper>
 
       <GameArea width={gridSize.gridWidth * 20} height={gridSize.gridHeight * 20}>
         {renderGrid()}
