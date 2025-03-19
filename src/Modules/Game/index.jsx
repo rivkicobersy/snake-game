@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { MdRestartAlt } from "react-icons/md";
+import Modal from "../Modal";
 import { calculateGridSize, generateFood } from "./functions";
 import { Button, Cell, GameArea, GameContainer, Image, InfoText, Overlay, Score, Title, TitleWrapper } from "./styles";
 
@@ -25,8 +27,25 @@ const Game = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [speed, setSpeed] = useState(150);
   const [gridSize, setGridSize] = useState(calculateGridSize());
-
+  const [lastDirectionChange, setLastDirectionChange] = useState(Date.now());
+  const [showModal, setShowModal] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
+
+  const handleRestartClick = () => {
+    setIsPaused(true);
+    setShowModal(true);
+  };
+
+  const handleConfirmRestart = () => {
+    resetGame();
+    setShowModal(false);
+    setIsPaused(false);
+  };
+
+  const handleCancelRestart = () => {
+    setShowModal(false);
+    setIsPaused(false);
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -146,28 +165,45 @@ const Game = () => {
     (event) => {
       event.preventDefault();
 
+      const currentTime = Date.now();
+      const timeSinceLastChange = currentTime - lastDirectionChange;
+
+      if (timeSinceLastChange < 150) return;
+
       switch (event.key) {
         case "ArrowUp":
         case "w":
-          if (direction !== "DOWN") setDirection("UP");
+          if (direction !== "DOWN") {
+            setDirection("UP");
+            setLastDirectionChange(currentTime);
+          }
           break;
         case "ArrowDown":
         case "s":
-          if (direction !== "UP") setDirection("DOWN");
+          if (direction !== "UP") {
+            setDirection("DOWN");
+            setLastDirectionChange(currentTime);
+          }
           break;
         case "ArrowLeft":
         case "a":
-          if (direction !== "RIGHT") setDirection("LEFT");
+          if (direction !== "RIGHT") {
+            setDirection("LEFT");
+            setLastDirectionChange(currentTime);
+          }
           break;
         case "ArrowRight":
         case "d":
-          if (direction !== "LEFT") setDirection("RIGHT");
+          if (direction !== "LEFT") {
+            setDirection("RIGHT");
+            setLastDirectionChange(currentTime);
+          }
           break;
         case " ":
           setIsPaused((prev) => !prev);
           break;
         case "r":
-          resetGame();
+          handleRestartClick();
           break;
         case "Enter":
           if (gameOver) {
@@ -178,7 +214,7 @@ const Game = () => {
           break;
       }
     },
-    [direction, gameOver]
+    [direction, gameOver, lastDirectionChange]
   );
 
   useEffect(() => {
@@ -284,7 +320,9 @@ const Game = () => {
             <Score>{localStorage.getItem("highScore")}</Score>
           </InfoText>
         </Title>
-        <Title>Snake Game</Title>
+        <Title>
+          <MdRestartAlt onClick={handleRestartClick} cursor="pointer" />
+        </Title>
       </TitleWrapper>
 
       <GameArea width={gridSize.gridWidth * 20} height={gridSize.gridHeight * 20}>
@@ -303,6 +341,13 @@ const Game = () => {
           </Overlay>
         )}
       </GameArea>
+      {showModal && (
+        <Modal
+          message="Are you sure you want to restart the game?"
+          onConfirm={handleConfirmRestart}
+          onCancel={handleCancelRestart}
+        />
+      )}
     </GameContainer>
   );
 };

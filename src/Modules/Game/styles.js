@@ -97,7 +97,6 @@ const Overlay = styled.div`
   align-items: center;
   background-color: rgba(0, 0, 0, 0.7);
   color: white;
-  z-index: 10;
   border-radius: 8px;
 `;
 
