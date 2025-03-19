@@ -93,10 +93,8 @@ const Game = () => {
     if (eatenFood) {
       setScore((prevScore) => prevScore + eatenFood.fruit.points);
 
-      for (let i = 0; i < eatenFood.fruit.points; i++) {
-        const newTail = { ...newSnake[newSnake.length - 1] };
-        newSnake.push(newTail);
-      }
+      const newTail = { ...newSnake[newSnake.length - 1] };
+      newSnake.push(newTail);
 
       while (newFoods.length < 5) {
         newFoods.push(generateFood(newSnake, gridSize));
