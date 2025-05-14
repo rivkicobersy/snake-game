@@ -2,7 +2,10 @@
   "name": "snake-game",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "type": "module",  
+  "engines": {
+    "node": ">=18.0.0 <21"
+  },
   "scripts": {
     "start": "vite",
     "build": "vite build",
