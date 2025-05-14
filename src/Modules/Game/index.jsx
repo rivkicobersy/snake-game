@@ -19,11 +19,15 @@ import {
 const Game = () => {
   const { gridWidth, gridHeight } = calculateGridSize();
   const [isMuted, setIsMuted] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
+  const [score, setScore] = useState(0);
 
   const backgroundAudioRef = useRef(new Audio("/sounds/background.mp3"));
   const gameOverAudioRef = useRef(new Audio("/sounds/gameover.mp3"));
   const eatAudioRef = useRef(new Audio("/sounds/eat.mp3"));
   backgroundAudioRef.current.loop = true;
+
   useEffect(() => {
     backgroundAudioRef.current.muted = isMuted;
     gameOverAudioRef.current.muted = isMuted;
@@ -31,7 +35,7 @@ const Game = () => {
   }, [isMuted]);
 
   useEffect(() => {
-    if (!gameOver && score === 0) {
+    if (!gameOver && score === 0 && !isPaused) {
       backgroundAudioRef.current.play().catch(() => {});
     }
 
@@ -39,7 +43,7 @@ const Game = () => {
       backgroundAudioRef.current.pause();
       backgroundAudioRef.current.currentTime = 0;
     };
-  }, []);
+  }, [gameOver, score, isPaused]);
 
   const handleToggleMute = () => {
     setIsMuted((prev) => {
@@ -66,9 +70,6 @@ const Game = () => {
       .fill(null)
       .map(() => generateFood(snake, { gridWidth, gridHeight }))
   );
-  const [gameOver, setGameOver] = useState(false);
-  const [score, setScore] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
   const [speed, setSpeed] = useState(150);
   const [gridSize, setGridSize] = useState(calculateGridSize());
   const [lastDirectionChange, setLastDirectionChange] = useState(Date.now());
