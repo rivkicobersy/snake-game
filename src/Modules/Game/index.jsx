@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { MdRestartAlt } from "react-icons/md";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { MdRestartAlt, MdVolumeOff, MdVolumeUp } from "react-icons/md";
 import Modal from "../Modal";
 import { calculateGridSize, generateFood } from "./functions";
 import {
@@ -18,6 +18,38 @@ import {
 
 const Game = () => {
   const { gridWidth, gridHeight } = calculateGridSize();
+  const [isMuted, setIsMuted] = useState(false);
+
+  const backgroundAudioRef = useRef(new Audio("/sounds/background.mp3"));
+  const gameOverAudioRef = useRef(new Audio("/sounds/gameover.mp3"));
+  const eatAudioRef = useRef(new Audio("/sounds/eat.mp3"));
+  backgroundAudioRef.current.loop = true;
+  useEffect(() => {
+    backgroundAudioRef.current.muted = isMuted;
+    gameOverAudioRef.current.muted = isMuted;
+    eatAudioRef.current.muted = isMuted;
+  }, [isMuted]);
+
+  useEffect(() => {
+    if (!gameOver && score === 0) {
+      backgroundAudioRef.current.play().catch(() => {});
+    }
+
+    return () => {
+      backgroundAudioRef.current.pause();
+      backgroundAudioRef.current.currentTime = 0;
+    };
+  }, []);
+
+  const handleToggleMute = () => {
+    setIsMuted((prev) => {
+      const newMuted = !prev;
+      backgroundAudioRef.current.muted = newMuted;
+      gameOverAudioRef.current.muted = newMuted;
+      eatAudioRef.current.muted = newMuted;
+      return newMuted;
+    });
+  };
 
   const getHighScore = () => {
     const highScore = localStorage.getItem("highScore");
@@ -115,6 +147,9 @@ const Game = () => {
 
     if (checkCollision(head)) {
       setGameOver(true);
+      backgroundAudioRef.current.pause();
+      backgroundAudioRef.current.currentTime = 0;
+      gameOverAudioRef.current.play();
       return;
     }
 
@@ -129,6 +164,9 @@ const Game = () => {
     });
 
     if (eatenFood) {
+      eatAudioRef.current.currentTime = 0;
+      eatAudioRef.current.play();
+
       setScore((prevScore) => prevScore + eatenFood.fruit.points);
 
       const newTail = { ...newSnake[newSnake.length - 1] };
@@ -171,6 +209,12 @@ const Game = () => {
     setScore(0);
     setIsPaused(false);
     setSpeed(150);
+
+    gameOverAudioRef.current.pause();
+    gameOverAudioRef.current.currentTime = 0;
+
+    backgroundAudioRef.current.currentTime = 0;
+    backgroundAudioRef.current.play();
   };
 
   useEffect(() => {
@@ -358,9 +402,30 @@ const Game = () => {
             <Score>{localStorage.getItem("highScore")}</Score>
           </InfoText>
         </Title>
-        <Title>
-          <MdRestartAlt onClick={handleRestartClick} cursor="pointer" />
-        </Title>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <Title>
+            <MdRestartAlt
+              onClick={handleRestartClick}
+              cursor="pointer"
+              size={24}
+            />
+          </Title>
+          <Title>
+            {isMuted ? (
+              <MdVolumeOff
+                onClick={handleToggleMute}
+                cursor="pointer"
+                size={24}
+              />
+            ) : (
+              <MdVolumeUp
+                onClick={handleToggleMute}
+                cursor="pointer"
+                size={24}
+              />
+            )}
+          </Title>
+        </div>
       </TitleWrapper>
 
       <GameArea
