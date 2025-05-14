@@ -22,8 +22,22 @@ const TitleWrapper = styled.div`
 `;
 
 const Image = styled.img`
-  height: 30px;
-  width: 30px;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+`;
+
+const IconImage = styled.img`
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  object-fit: contain;
+  user-select: none;
 `;
 
 const InfoPanel = styled.div`
@@ -126,4 +140,17 @@ const Score = styled.p`
   padding-left: 0.2rem;
 `;
 
-export { Button, Cell, GameArea, GameContainer, Image, InfoPanel, InfoText, Overlay, Score, Title, TitleWrapper };
+export {
+  Button,
+  Cell,
+  GameArea,
+  GameContainer,
+  IconImage,
+  Image,
+  InfoPanel,
+  InfoText,
+  Overlay,
+  Score,
+  Title,
+  TitleWrapper,
+};

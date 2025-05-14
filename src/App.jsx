@@ -1,4 +1,4 @@
-import { Game } from "./Modules";
+import { Game } from "./modules";
 
 const App = () => {
   return <Game />;
