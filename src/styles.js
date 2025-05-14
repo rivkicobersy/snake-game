@@ -14,7 +14,7 @@ const GlobalStyle = createGlobalStyle`
     height: 100%;
     width: 100%;
     overflow: hidden;
-    background-image: url("/skin.jpeg");
+    background-image: url("/skin.png");
     background-blend-mode: overlay;
 
   }
