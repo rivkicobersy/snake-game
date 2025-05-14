@@ -102,12 +102,7 @@ const Game = () => {
 
   const checkCollision = useCallback(
     (head) => {
-      if (
-        head.x < 0 ||
-        head.x >= gridSize.gridWidth ||
-        head.y < 0 ||
-        head.y >= gridSize.gridHeight
-      ) {
+      if (head.x < 0 || head.x >= gridSize.gridWidth || head.y < 0 || head.y >= gridSize.gridHeight) {
         return true;
       }
 
@@ -313,8 +308,7 @@ const Game = () => {
       const deltaY = touchEndY - touchStart.y;
 
       const swipeThreshold = 30;
-      const isSwipe =
-        Math.abs(deltaX) > swipeThreshold || Math.abs(deltaY) > swipeThreshold;
+      const isSwipe = Math.abs(deltaX) > swipeThreshold || Math.abs(deltaY) > swipeThreshold;
 
       if (isSwipe) {
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
@@ -356,32 +350,18 @@ const Game = () => {
     const grid = [];
     for (let y = 0; y < gridHeight; y++) {
       for (let x = 0; x < gridWidth; x++) {
-        const isSnake = snake.some(
-          (segment) => segment.x === x && segment.y === y
-        );
+        const isSnake = snake.some((segment) => segment.x === x && segment.y === y);
         const isHead = snake[0].x === x && snake[0].y === y;
 
         if (isSnake || isHead) {
-          grid.push(
-            <Cell
-              key={`${x}-${y}`}
-              x={x}
-              y={y}
-              isSnake={isSnake}
-              isHead={isHead}
-              cellSize={20}
-            />
-          );
+          grid.push(<Cell key={`${x}-${y}`} x={x} y={y} isSnake={isSnake} isHead={isHead} cellSize={20} />);
         }
 
         foods.forEach((food) => {
           if (food.x === x && food.y === y) {
             grid.push(
               <Cell key={`${x}-${y}`} x={x} y={y} cellSize={20} isFood={true}>
-                <Image
-                  src={food.fruit.imgSrc}
-                  style={{ width: "100%", height: "100%" }}
-                />
+                <Image src={food.fruit.imgSrc} style={{ width: "100%", height: "100%" }} />
               </Cell>
             );
           }
@@ -404,34 +384,19 @@ const Game = () => {
         </Title>
         <div style={{ display: "flex", gap: "10px" }}>
           <Title>
-            <MdRestartAlt
-              onClick={handleRestartClick}
-              cursor="pointer"
-              size={24}
-            />
+            <MdRestartAlt onClick={handleRestartClick} cursor="pointer" size={24} />
           </Title>
           <Title>
             {isMuted ? (
-              <MdVolumeOff
-                onClick={handleToggleMute}
-                cursor="pointer"
-                size={24}
-              />
+              <MdVolumeOff onClick={handleToggleMute} cursor="pointer" size={24} />
             ) : (
-              <MdVolumeUp
-                onClick={handleToggleMute}
-                cursor="pointer"
-                size={24}
-              />
+              <MdVolumeUp onClick={handleToggleMute} cursor="pointer" size={24} />
             )}
           </Title>
         </div>
       </TitleWrapper>
 
-      <GameArea
-        width={gridSize.gridWidth * 20}
-        height={gridSize.gridHeight * 20}
-      >
+      <GameArea width={gridSize.gridWidth * 20} height={gridSize.gridHeight * 20}>
         {renderGrid()}
         {gameOver && (
           <Overlay>
