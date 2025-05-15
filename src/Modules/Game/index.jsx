@@ -23,32 +23,32 @@ const Game = () => {
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
 
-  const backgroundAudioRef = useRef(new Audio("/sounds/background.mp3"));
+  // const backgroundAudioRef = useRef(new Audio("/sounds/background.mp3"));
   const gameOverAudioRef = useRef(new Audio("/sounds/gameover.mp3"));
   const eatAudioRef = useRef(new Audio("/sounds/eat.mp3"));
-  backgroundAudioRef.current.loop = true;
+  // backgroundAudioRef.current.loop = true;
 
   useEffect(() => {
-    backgroundAudioRef.current.muted = isMuted;
+    // backgroundAudioRef.current.muted = isMuted;
     gameOverAudioRef.current.muted = isMuted;
     eatAudioRef.current.muted = isMuted;
   }, [isMuted]);
 
   useEffect(() => {
-    if (!gameOver && score === 0 && !isPaused) {
-      backgroundAudioRef.current.play().catch(() => {});
+    if (!gameOver && score === 0) {
+      // backgroundAudioRef.current.play().catch(() => {});
     }
 
     return () => {
-      backgroundAudioRef.current.pause();
-      backgroundAudioRef.current.currentTime = 0;
+      // backgroundAudioRef.current.pause();
+      // backgroundAudioRef.current.currentTime = 0;
     };
-  }, [gameOver, score, isPaused]);
+  }, [gameOver, score]);
 
   const handleToggleMute = () => {
     setIsMuted((prev) => {
       const newMuted = !prev;
-      backgroundAudioRef.current.muted = newMuted;
+      // backgroundAudioRef.current.muted = newMuted;
       gameOverAudioRef.current.muted = newMuted;
       eatAudioRef.current.muted = newMuted;
       return newMuted;
@@ -143,8 +143,8 @@ const Game = () => {
 
     if (checkCollision(head)) {
       setGameOver(true);
-      backgroundAudioRef.current.pause();
-      backgroundAudioRef.current.currentTime = 0;
+      // backgroundAudioRef.current.pause();
+      // backgroundAudioRef.current.currentTime = 0;
       gameOverAudioRef.current.play();
       return;
     }
@@ -209,8 +209,8 @@ const Game = () => {
     gameOverAudioRef.current.pause();
     gameOverAudioRef.current.currentTime = 0;
 
-    backgroundAudioRef.current.currentTime = 0;
-    backgroundAudioRef.current.play();
+    // backgroundAudioRef.current.currentTime = 0;
+    // backgroundAudioRef.current.play();
   };
 
   useEffect(() => {
