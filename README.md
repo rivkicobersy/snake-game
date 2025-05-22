@@ -1,12 +1,20 @@
-# React + Vite
+Snakie 🎮
+A fun and nostalgic Snake game built with React. Snakie features smooth animations, colorful styling, and sound effects to enhance the classic gaming experience — all playable right in your browser.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+🚀 What technologies are used for this project?
+This project is built with:
 
-Currently, two official plugins are available:
+React – for building the game interface
+JavaScript – for game logic and interactivity
+CSS – for custom styling and layout
+HTML5 Audio – for background music and sound effects
+🎮 Features
+Classic snake gameplay with modern styling
+Animated movement and smooth controls
+Audio feedback for game events
+Responsive design for desktop and mobile
+Game-over screen with replay option
+🌐 Live Demo
+Play it here: snakie-game.netlify.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Feel free to fork the repo and customize the game!
